@@ -52,7 +52,7 @@ def run_net(model, train_data, test_data, lr=1e-1, momentum=0.75, it=10):
 
             # pred = distance(out, dic)
             # label = bin2dec(label)
-            pred = out.max(1)
+            _, pred = out.max(1)
             num_correct = (pred == label).sum().item()
             acc = num_correct / image.shape[0]
             test_acc += acc
