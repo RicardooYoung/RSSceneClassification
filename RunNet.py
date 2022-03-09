@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import time
 import numpy as np
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import ToTensor
 from matplotlib import pyplot as plt
@@ -90,7 +90,7 @@ train_set = ImageFolder(root=train_path, transform=ToTensor())
 train_data = DataLoader(train_set, batch_size=64, shuffle=True)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
 test_data = DataLoader(test_set, batch_size=64, shuffle=False)
-print('Dataset loaded.')
+print('Dataset created.')
 model = ResNet.ResNet18(256, 3, 45)
 if torch.cuda.is_available():
     model.cuda()

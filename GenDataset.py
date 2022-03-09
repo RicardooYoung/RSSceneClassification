@@ -38,3 +38,5 @@ for i in range(len(category)):
         else:
             dst_file = test_path + '/' + file_list[j]
         copyfile(current_file, dst_file)
+
+print('Successfully created dataset.')
