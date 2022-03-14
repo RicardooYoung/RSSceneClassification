@@ -39,4 +39,4 @@ for i in range(len(category)):
             dst_file = test_path + '/' + file_list[j]
         copyfile(current_file, dst_file)
 
-print('Successfully created dataset.')
+print('Dataset successfully generated.')
