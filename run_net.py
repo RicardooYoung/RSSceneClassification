@@ -40,13 +40,10 @@ if __name__ == '__main__':
         total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
         torch.cuda.empty_cache()
 
-        if epoch >= 5 and abs(total_train_loss[epoch] - total_train_loss[epoch - 1]) < lr * 1e+2:
-            if lr > 1e-5:
-                lr /= 10
-                print('Learning rate changed.')
-            else:
-                print('Learning rate is too small to be changed.')
-        # If error rate plateaus, decrease the learning rate.
+        if epoch == 4 or epoch == 8 or epoch == 12 or epoch == 16:
+            lr /= 2
+            print('Learning rate changed.')
+        # Periodically change learning rate.
         if epoch >= 5 and total_test_loss[epoch] > total_test_loss[epoch - 1] > total_test_loss[epoch - 2]:
             if weight_decay <= 1e-3:
                 weight_decay += 1e-4
