@@ -48,9 +48,10 @@ if __name__ == '__main__':
                 print('Learning rate is too small to be changed.')
         # If error rate plateaus, decrease the learning rate.
         if epoch >= 5 and total_test_loss[epoch] > total_test_loss[epoch - 1] > total_test_loss[epoch - 2]:
-            if weight_decay <= 5 * 1e-4:
+            if weight_decay <= 1e-3:
                 weight_decay += 1e-4
                 print('Weight decay changed.')
+                continue
             else:
                 print('Weight decay is too big to be changed.')
         if epoch >= 5 and total_train_acc[epoch] - total_test_acc[epoch] >= 0.1 * (1e-4 / weight_decay):
@@ -73,4 +74,17 @@ if __name__ == '__main__':
     plt.ylabel('Accuracy')
     plt.xticks(new_tick)
     plt.legend(['Train Acc', 'Test Acc'])
+    plt.savefig('fig1.jpg')
+    plt.show()
+
+    width = 0.25
+    plt.figure()
+    plt.bar(epoch - width / 2, total_train_loss, width)
+    plt.bar(epoch + width / 2, total_test_loss, width)
+    plt.title('Train & Test Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.xticks(new_tick)
+    plt.legend(['Train Loss', 'Test Loss'])
+    plt.savefig('fig2.jpg')
     plt.show()
