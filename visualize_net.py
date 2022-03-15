@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import ToTensor
 
-import TestNet
+import evaluator
 
 path = 'Data'
 dataset = ImageFolder(root=path, transform=ToTensor())

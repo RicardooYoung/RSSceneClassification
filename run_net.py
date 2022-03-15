@@ -5,9 +5,9 @@ from torchvision.datasets import ImageFolder
 from torchvision.transforms import ToTensor
 from matplotlib import pyplot as plt
 
-import ResNet
-import TrainNet
-import TestNet
+import resnet
+import trainer
+import evaluator
 
 train_path = 'Dataset/train'
 test_path = 'Dataset/test'
@@ -15,7 +15,7 @@ train_set = ImageFolder(root=train_path, transform=ToTensor())
 train_data = DataLoader(train_set, batch_size=64, shuffle=True, num_workers=3)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
 test_data = DataLoader(test_set, batch_size=32, shuffle=False, num_workers=3)
-model = ResNet.ResNet34(45)
+model = resnet.ResNet34(45)
 if torch.cuda.is_available():
     model.cuda()
 
@@ -29,10 +29,10 @@ total_test_loss = np.zeros(max_iteration)
 
 if __name__ == '__main__':
     for epoch in range(max_iteration):
-        total_train_acc[epoch], total_train_loss[epoch] = TrainNet.train_net(model, train_data, epoch, lr=lr,
-                                                                             momentum=0.9, weight_decay=weight_decay)
+        total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, epoch, lr=lr,
+                                                                            momentum=0.9, weight_decay=weight_decay)
         torch.cuda.empty_cache()
-        total_test_acc[epoch], total_test_loss[epoch] = TestNet.test_net(model, test_data, epoch)
+        total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
         torch.cuda.empty_cache()
 
         if epoch >= 5 and abs(total_train_loss[epoch] - total_train_loss[epoch - 1]) < lr * 1e+2:
