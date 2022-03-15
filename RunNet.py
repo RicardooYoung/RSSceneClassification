@@ -12,10 +12,10 @@ import TestNet
 train_path = 'Dataset/train'
 test_path = 'Dataset/test'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
-train_data = DataLoader(train_set, batch_size=128, shuffle=True, num_workers=4)
+train_data = DataLoader(train_set, batch_size=64, shuffle=True, num_workers=1)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
-test_data = DataLoader(test_set, batch_size=64, shuffle=False, num_workers=2)
-model = ResNet.ResNet18(256, 3, 45)
+test_data = DataLoader(test_set, batch_size=32, shuffle=False)
+model = ResNet.ResNet34(45)
 if torch.cuda.is_available():
     model.cuda()
 
@@ -25,7 +25,7 @@ total_test_acc = np.zeros(max_iteration)
 
 if __name__ == '__main__':
     for epoch in range(max_iteration):
-        total_train_acc[epoch] = TrainNet.train_net(model, train_data, epoch, lr=1e-3, momentum=0.5)
+        total_train_acc[epoch] = TrainNet.train_net(model, train_data, epoch, lr=1e-3, momentum=0.9, weight_decay=1e-4)
         torch.cuda.empty_cache()
         total_test_acc[epoch] = TestNet.test_net(model, test_data, epoch)
 

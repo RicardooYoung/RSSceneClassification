@@ -28,33 +28,41 @@ class ResBlock(nn.Module):
         return y
 
 
-class ResNet18(nn.Module):
-    def __init__(self, input_size, input_channels, num_class):
-        super(ResNet18, self).__init__()
+class ResNet34(nn.Module):
+    def __init__(self, num_class):
+        super(ResNet34, self).__init__()
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels=input_channels, out_channels=64, kernel_size=7,
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7,
                       stride=2, padding=3, bias=False),
             # size = /2
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-            nn.AvgPool2d(kernel_size=3, stride=2, padding=1)
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
             # size = /4
         )
         self.block = nn.Sequential(
             ResBlock(64, 64, 1),
             ResBlock(64, 64, 1),
+            ResBlock(64, 64, 1),
             ResBlock(64, 128, 2),
             # size = /8
+            ResBlock(128, 128, 1),
+            ResBlock(128, 128, 1),
             ResBlock(128, 128, 1),
             ResBlock(128, 256, 2),
             # size = /16
             ResBlock(256, 256, 1),
+            ResBlock(256, 256, 1),
+            ResBlock(256, 256, 1),
+            ResBlock(256, 256, 1),
+            ResBlock(256, 256, 1),
             ResBlock(256, 512, 2),
             # size = /32
-            ResBlock(512, 512, 1)
+            ResBlock(512, 512, 1),
+            ResBlock(512, 512, 1),
+            nn.AvgPool2d(kernel_size=8)
         )
-        self.fc = nn.Linear(int(((input_size / 32) ** 2) * 512), num_class)
-        # Remember to change!
+        self.fc = nn.Linear(512, num_class)
 
     def forward(self, x):
         x = self.conv1(x)

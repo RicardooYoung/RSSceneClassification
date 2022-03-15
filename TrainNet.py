@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
 import time
+from tqdm import tqdm
 
 
-def train_net(model, train_data, epoch, lr=1e-1, momentum=0.0):
+def train_net(model, train_data, epoch, lr=1e-1, momentum=0.0, weight_decay=0.0):
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 
     print('Epoch {} start.'.format(epoch + 1))
 
@@ -14,7 +15,7 @@ def train_net(model, train_data, epoch, lr=1e-1, momentum=0.0):
     train_acc = 0
     model.train()
 
-    for image, label in train_data:
+    for image, label in tqdm(train_data):
         if torch.cuda.is_available():
             image = image.cuda()
             label = label.cuda()
