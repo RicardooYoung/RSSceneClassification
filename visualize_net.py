@@ -11,4 +11,4 @@ data = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=4)
 model = torch.load('model.pth')
 
 if __name__ == '__main__':
-    acc, loss = TestNet.test_net(model, data)
+    acc, loss = evaluator.test_net(model, data)
