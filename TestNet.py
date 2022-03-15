@@ -3,7 +3,7 @@ import torch.nn as nn
 import time
 
 
-def test_net(model, test_data, epoch):
+def test_net(model, test_data, epoch=0):
     loss_fn = nn.CrossEntropyLoss()
     time_start = time.time()
     test_loss = 0
@@ -27,7 +27,7 @@ def test_net(model, test_data, epoch):
     time_end = time.time()
 
     print(
-        'Epoch: {}, Test Loss: {:.6f}, Test Acc: {:.6f}, Time elapsed: {:.3f}s'
+        'Epoch: {}, Test Loss: {:.6f}, Test Acc: {:.6f}, Time Elapsed: {:.3f}s'
             .format(epoch + 1, test_loss / len(test_data), test_acc / len(test_data), time_end - time_start))
 
-    return test_acc / len(test_data)
+    return test_acc / len(test_data), test_loss / len(test_data)
