@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 print('Weight decay changed.')
             else:
                 print('Weight decay is too big to be changed.')
-        if epoch >= 5 and total_train_loss[epoch] - total_test_loss[epoch] >= 0.1 * (1e-4 / weight_decay):
+        if epoch >= 5 and total_train_acc[epoch] - total_test_acc[epoch] >= 0.1 * (1e-4 / weight_decay):
             if weight_decay <= 5 * 1e-4:
                 weight_decay += 1e-4
                 print('Weight decay changed.')
