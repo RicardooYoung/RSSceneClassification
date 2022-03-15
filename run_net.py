@@ -44,14 +44,14 @@ if __name__ == '__main__':
             lr /= 2
             print('Learning rate changed.')
         # Periodically change learning rate.
-        if epoch >= 5 and total_test_loss[epoch] > total_test_loss[epoch - 1] > total_test_loss[epoch - 2]:
+        if epoch >= 4 and total_test_loss[epoch] > total_test_loss[epoch - 1] > total_test_loss[epoch - 2]:
             if weight_decay <= 1e-3:
                 weight_decay += 1e-4
                 print('Weight decay changed.')
                 continue
             else:
                 print('Weight decay is too big to be changed.')
-        if epoch >= 5 and total_train_acc[epoch] - total_test_acc[epoch] >= 0.1 * (1e-4 / weight_decay):
+        if epoch >= 4 and total_train_acc[epoch] - total_test_acc[epoch] >= 0.1 * (1e-4 / weight_decay):
             if weight_decay <= 5 * 1e-4:
                 weight_decay += 1e-4
                 print('Weight decay changed.')
