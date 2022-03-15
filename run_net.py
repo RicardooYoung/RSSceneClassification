@@ -15,13 +15,18 @@ train_set = ImageFolder(root=train_path, transform=ToTensor())
 train_data = DataLoader(train_set, batch_size=64, shuffle=True, num_workers=3)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
 test_data = DataLoader(test_set, batch_size=32, shuffle=False, num_workers=3)
+# Load dataset.
+
 model = resnet.ResNet34(45)
 if torch.cuda.is_available():
     model.cuda()
+# Initialize CNN.
 
 max_iteration = 20
 lr = 1e-3
 weight_decay = 1e-4
+# Define hyper-parameter
+
 total_train_acc = np.zeros(max_iteration)
 total_test_acc = np.zeros(max_iteration)
 total_train_loss = np.zeros(max_iteration)
