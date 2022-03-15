@@ -12,9 +12,9 @@ import TestNet
 train_path = 'Dataset/train'
 test_path = 'Dataset/test'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
-train_data = DataLoader(train_set, batch_size=64, shuffle=True, num_workers=1)
+train_data = DataLoader(train_set, batch_size=64, shuffle=True, num_workers=3)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
-test_data = DataLoader(test_set, batch_size=32, shuffle=False)
+test_data = DataLoader(test_set, batch_size=32, shuffle=False, num_workers=3)
 model = ResNet.ResNet34(45)
 if torch.cuda.is_available():
     model.cuda()
