@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import time
+from tqdm import tqdm
 
 
 def test_net(model, test_data, epoch=0):
@@ -10,7 +11,7 @@ def test_net(model, test_data, epoch=0):
     test_acc = 0
     model.eval()
 
-    for image, label in test_data:
+    for image, label in tqdm(test_data):
         if torch.cuda.is_available():
             image = image.cuda()
             label = label.cuda()

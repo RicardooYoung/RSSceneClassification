@@ -14,7 +14,7 @@ test_path = 'Dataset/test'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
 train_data = DataLoader(train_set, batch_size=32, shuffle=True, num_workers=3)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
-test_data = DataLoader(test_set, batch_size=32, shuffle=False, num_workers=3)
+test_data = DataLoader(test_set, batch_size=16, shuffle=False, num_workers=3)
 # Load dataset.
 
 # model = resnet.ResNet34(45)
@@ -36,14 +36,14 @@ lr_record = np.zeros(max_iteration)
 if __name__ == '__main__':
     for epoch in range(max_iteration):
         total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, epoch, lr=lr,
-                                                                            momentum=0.9, weight_decay=1e-4)
+                                                                            momentum=0.99, weight_decay=1e-4)
         torch.cuda.empty_cache()
         total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
         torch.cuda.empty_cache()
         lr_record[epoch] = lr
 
-        if epoch % 3 == 2:
-            lr /= 2
+        if epoch == 2:
+            lr = lr * 10
 
     torch.save(model, 'model.pth')
 
