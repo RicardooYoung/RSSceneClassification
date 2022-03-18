@@ -38,5 +38,6 @@ for i in range(len(category)):
         else:
             dst_file = test_path + '/' + file_list[j]
         copyfile(current_file, dst_file)
+    print('Class {} created.'.format(category[i]))
 
 print('Dataset successfully generated.')
