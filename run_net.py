@@ -9,21 +9,22 @@ import resnet
 import trainer
 import evaluator
 
+batch_size = 80
 train_path = 'Dataset/train'
 test_path = 'Dataset/test'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
-train_data = DataLoader(train_set, batch_size=32, shuffle=True, num_workers=3)
+train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=3)
 test_set = ImageFolder(root=test_path, transform=ToTensor())
-test_data = DataLoader(test_set, batch_size=16, shuffle=False, num_workers=3)
+test_data = DataLoader(test_set, batch_size=int(batch_size / 2), shuffle=False, num_workers=3)
 # Load dataset.
 
-# model = resnet.ResNet34(45)
-model = resnet.ResNet50(45)
+model = resnet.ResNet34(45)
+# model = resnet.ResNet50(45)
 if torch.cuda.is_available():
     model.cuda()
 # Initialize CNN.
 
-max_iteration = 10
+max_iteration = 15
 lr = 1e-3
 # Define hyper-parameter
 
@@ -36,14 +37,16 @@ lr_record = np.zeros(max_iteration)
 if __name__ == '__main__':
     for epoch in range(max_iteration):
         total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, epoch, lr=lr,
-                                                                            momentum=0.99, weight_decay=1e-4)
+                                                                            momentum=0.9, weight_decay=1e-4)
         torch.cuda.empty_cache()
         total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
         torch.cuda.empty_cache()
         lr_record[epoch] = lr
 
         if epoch == 2:
-            lr = lr * 10
+            lr *= 10
+        elif epoch % 5 == 0:
+            lr /= 10
 
     torch.save(model, 'model.pth')
 
