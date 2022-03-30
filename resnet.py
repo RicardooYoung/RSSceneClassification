@@ -56,6 +56,32 @@ class BottleNeck(nn.Module):
         return y
 
 
+class PreResUnit(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=1):
+        super(PreResUnit, self).__init__()
+        self.block = nn.Sequential(
+            nn.BatchNorm2d(in_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3,
+                      stride=stride, padding=1),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=3,
+                      stride=1, padding=1),
+        )
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_channels != out_channels:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=1,
+                          stride=stride)
+            )
+
+    def forward(self, x):
+        y = self.block(x)
+        y += self.shortcut(x)
+        return y
+
+
 class ResNet34(nn.Module):
     def __init__(self, num_class):
         super(ResNet34, self).__init__()
@@ -99,6 +125,53 @@ class ResNet34(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.block(x)
+        x = x.view(x.size()[0], -1)
+        x = self.fc(x)
+        return x
+
+
+class PreResNet34(nn.Module):
+    def __init__(self, num_class):
+        super(PreResNet34, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7,
+                      stride=2, padding=3, bias=False),
+            # size = /2
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            # size = /4
+        )
+        self.block = nn.Sequential(
+            PreResUnit(64, 64),
+            PreResUnit(64, 64),
+            PreResUnit(64, 64),
+            # conv2_x
+            PreResUnit(64, 128, 2),
+            # size = /8
+            PreResUnit(128, 128),
+            PreResUnit(128, 128),
+            PreResUnit(128, 128),
+            # conv3_x
+            PreResUnit(128, 256, 2),
+            # size = /16
+            PreResUnit(256, 256),
+            PreResUnit(256, 256),
+            PreResUnit(256, 256),
+            PreResUnit(256, 256),
+            PreResUnit(256, 256),
+            # conv4_x
+            PreResUnit(256, 512, 2),
+            # size = /32
+            PreResUnit(512, 512),
+            PreResUnit(512, 512),
+            # conv5_x
+            nn.AvgPool2d(kernel_size=8)
+        )
+        self.fc = nn.Linear(512, num_class)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.block(x)
+        x = f.relu(x, inplace=True)
         x = x.view(x.size()[0], -1)
         x = self.fc(x)
         return x

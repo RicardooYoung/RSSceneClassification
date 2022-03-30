@@ -10,6 +10,8 @@ import trainer
 import evaluator
 
 batch_size = 96
+# 96 for ResNet34
+# 32 for ResNet50
 train_path = 'Dataset/train'
 test_path = 'Dataset/test'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
@@ -20,41 +22,40 @@ test_data = DataLoader(test_set, batch_size=int(batch_size / 2), shuffle=False, 
 
 model = resnet.ResNet34(45)
 # model = resnet.ResNet50(45)
+# model = resnet.PreResNet34(45)
+# model = torch.load('model.pth')
 if torch.cuda.is_available():
     model.cuda()
 # Initialize CNN.
 
-max_iteration = 20
+max_iteration = 30
 lr = 1e-3
+momentum = 0.9
 weight_decay = 1e-4
-flag = 0
 # Define hyper-parameter
 
 total_train_acc = np.zeros(max_iteration)
 total_test_acc = np.zeros(max_iteration)
 total_train_loss = np.zeros(max_iteration)
 total_test_loss = np.zeros(max_iteration)
+lr_curve = np.zeros(max_iteration)
 
 if __name__ == '__main__':
     for epoch in range(max_iteration):
-        total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, epoch, lr=lr,
-                                                                            momentum=0.9, weight_decay=weight_decay)
+        total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, lr, momentum,
+                                                                            weight_decay, epoch)
         torch.cuda.empty_cache()
         total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
         torch.cuda.empty_cache()
+        print(weight_decay)
 
-        if epoch != 0 and epoch % 4 == 0:
-            lr /= 2
-            print('Learning rate changed.')
-
-        if total_train_acc[epoch] - total_test_acc[epoch] >= 0.15:
-            if weight_decay <= 5 * 1e-4 and flag == 0:
-                weight_decay += 1e-4
-                flag = 1
-                print('Weight decay changed.')
-        else:
-            flag = 0
-            # Prevent change weight decay continuously
+        if epoch > 5:
+            temp = total_train_acc[epoch - 2:epoch + 1]
+            max_acc = max(temp)
+            min_acc = min(temp)
+            if max_acc - min_acc < 0.02:
+                lr /= 10
+                print('Learning rate changed.')
 
     torch.save(model, 'model.pth')
 

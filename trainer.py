@@ -4,9 +4,9 @@ import time
 from tqdm import tqdm
 
 
-def train_net(model, train_data, epoch=0, lr=1e-1, momentum=0.0, weight_decay=0.0):
-    loss_fn = nn.CrossEntropyLoss()
+def train_net(model, train_data, lr, momentum, weight_decay, epoch=0):
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
+    loss_fn = nn.CrossEntropyLoss()
 
     print('Epoch {} start.'.format(epoch + 1))
 
