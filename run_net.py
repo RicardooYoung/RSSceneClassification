@@ -50,7 +50,7 @@ if __name__ == '__main__':
         total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
         torch.cuda.empty_cache()
 
-        if epoch > 19:
+        if epoch >= 20:
             temp = total_train_acc[epoch - 5:epoch + 1]
             max_acc = max(temp)
             min_acc = min(temp)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
                 early_stop = epoch + 1
                 break
 
-        if epoch > 9:
+        if epoch >= 10:
             temp = total_train_acc[epoch - 2:epoch + 1]
             max_acc = max(temp)
             min_acc = min(temp)
