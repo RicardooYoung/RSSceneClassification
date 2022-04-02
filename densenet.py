@@ -1,13 +1,17 @@
 import torch.nn as nn
 import torch.nn.functional as f
 
+class DenseLayer(nn.Module):
+    def __init__(self, growth_rate):
+        super(DenseLayer, self).__init__()
+        pass
+
+
 
 class DenseBlock(nn.Module):
     def __init__(self, growth_rate):
         super(DenseBlock, self).__init__()
-        self.block = nn.Sequential(
-            *[nn.Conv2d() for i in range(5)]
-        )
+        pass
 
 
 class DenseNet101(nn.Module):
