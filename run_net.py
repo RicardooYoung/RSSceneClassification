@@ -9,7 +9,7 @@ import resnet
 import trainer
 import evaluator
 
-batch_size = 96
+batch_size = 32
 # 96 for ResNet34
 # 32 for ResNet50
 train_path = 'Dataset/train'
@@ -21,8 +21,8 @@ test_data = DataLoader(test_set, batch_size=int(batch_size / 2), shuffle=False, 
 # Load dataset.
 
 # model = resnet.ResNet34(45)
-# model = resnet.ResNet50(45)
-model = resnet.PreResNet34(45)
+model = resnet.ResNet50(45)
+# model = resnet.PreResNet34(45)
 # model = torch.load('model.pth')
 if torch.cuda.is_available():
     model.cuda()
@@ -56,15 +56,17 @@ if __name__ == '__main__':
             min_acc = min(temp)
             if max_acc - min_acc < 1e-4:
                 early_stop = epoch + 1
+                print('Early stop.')
                 break
 
         if epoch >= 10:
             temp = total_train_acc[epoch - 2:epoch + 1]
             max_acc = max(temp)
             min_acc = min(temp)
-            if max_acc - min_acc < 0.05:
+            if max_acc - min_acc < 3 * 1e-2:
                 lr /= 10
                 print('Learning rate changed.')
+
 
     torch.save(model, 'model.pth')
 
