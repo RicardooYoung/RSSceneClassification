@@ -6,10 +6,11 @@ from torchvision.transforms import ToTensor
 from matplotlib import pyplot as plt
 
 import resnet
+import densenet
 import trainer
 import evaluator
 
-batch_size = 32
+batch_size = 128
 # 96 for ResNet34
 # 32 for ResNet50
 train_path = 'Dataset/train'
@@ -21,9 +22,10 @@ test_data = DataLoader(test_set, batch_size=int(batch_size / 2), shuffle=False, 
 # Load dataset.
 
 # model = resnet.ResNet34(45)
-model = resnet.ResNet50(45)
+# model = resnet.ResNet50(45)
 # model = resnet.PreResNet34(45)
 # model = torch.load('model.pth')
+model = densenet.DenseNet121(12, 45)
 if torch.cuda.is_available():
     model.cuda()
 # Initialize CNN.
@@ -46,9 +48,10 @@ if __name__ == '__main__':
     for epoch in range(max_iteration):
         total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, lr, momentum,
                                                                             weight_decay, epoch)
-        torch.cuda.empty_cache()
-        total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
+        if (epoch + 1) % 5 == 0:
+            total_test_acc[epoch], total_test_loss[epoch] = evaluator.test_net(model, test_data, epoch)
+            # torch.cuda.empty_cache()
 
         if epoch >= 20:
             temp = total_train_acc[epoch - 5:epoch + 1]
@@ -66,7 +69,6 @@ if __name__ == '__main__':
             if max_acc - min_acc < 3 * 1e-2:
                 lr /= 10
                 print('Learning rate changed.')
-
 
     torch.save(model, 'model.pth')
 

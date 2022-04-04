@@ -33,7 +33,7 @@ for i in range(len(category)):
     random.shuffle(file_list)
     for j in range(len(file_list)):
         current_file = current_cate + '/' + file_list[j]
-        if j < 140:
+        if j < 350:
             dst_file = train_path + '/' + file_list[j]
         else:
             dst_file = test_path + '/' + file_list[j]
