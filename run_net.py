@@ -11,7 +11,7 @@ import densenet
 import trainer
 import evaluator
 
-batch_size = 96
+batch_size = 64
 # 96 for ResNet34
 # 32 for ResNet50
 # 64 for DenseNet
@@ -24,22 +24,21 @@ validation_data = DataLoader(validation_set, batch_size=int(batch_size / 2), shu
                              pin_memory=True)
 # Load dataset.
 
-model = resnet.ResNet34(45)
+# model = resnet.ResNet34(45)
 # model = resnet.ResNet50(45)
 # model = resnet.PreResNet34(45)
+model = densenet.DenseNet121(12, 45)
 # model = torch.load('model.pth')
-# model = densenet.DenseNet121(12, 45)
+
 if torch.cuda.is_available():
     model.cuda()
 # Initialize CNN.
 
 
-max_iteration = 50
+max_iteration = 20
 lr = 1e-2
-# 1e-2 for ResNet
-# 1e-1 for DenseNet
 momentum = 0.9
-weight_decay = 3 * 1e-4
+weight_decay = 1e-4
 # Define hyper-parameter
 
 lambda1 = lambda epoch: 0.9 ** epoch
