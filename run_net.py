@@ -18,16 +18,16 @@ batch_size = 64
 train_path = 'Dataset/train'
 validation_path = 'Dataset/validation'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
-train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
+train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
 validation_set = ImageFolder(root=validation_path, transform=ToTensor())
 validation_data = DataLoader(validation_set, batch_size=int(batch_size / 2), shuffle=False, num_workers=4,
                              pin_memory=True)
 # Load dataset.
 
-# model = resnet.ResNet34(45)
+model = resnet.ResNet34(45)
 # model = resnet.ResNet50(45)
 # model = resnet.PreResNet34(45)
-model = densenet.DenseNet121(12, 45)
+# model = densenet.DenseNet121(12, 45)
 # model = torch.load('model.pth')
 
 if torch.cuda.is_available():

@@ -17,8 +17,8 @@ def train_net(model, train_data, optimizer, epoch=0):
 
     for image, label in tqdm(train_data):
         if torch.cuda.is_available():
-            image = image.cuda()
-            label = label.cuda()
+            image = image.cuda(non_blocking=True)
+            label = label.cuda(non_blocking=True)
         out = model(image)
         loss = loss_fn(out, label)
 
