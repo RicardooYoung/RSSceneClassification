@@ -27,27 +27,30 @@ def triplet_loss(model, train_data, optimizer, margin=0.2, epoch=0):
         if torch.cuda.is_available():
             image = image.cuda()
         out = model(image)
+        out = out.reshape((len(out), 512))
         for i in range(len(label) - 2):
             for j in range(len(label) - i - 1):
                 for k in range(len(label) - i - j - 2):
                     if label[i] == label[i + j + 1]:
-                        if label[i] != label[i] != label[i + j + k + 2]:
-                            calculate_dist(out[i], out[j], out[k], margin)
-                            if 'anchor' not in dir():
-                                anchor = out[i]
-                                positive = out[j]
-                                negative = out[k]
-                            else:
-                                anchor = torch.stack((anchor, out[i]), dim=0)
-                                positive = torch.stack((positive, out[j]), dim=0)
-                                negative = torch.stack((negative, out[k]), dim=0)
+                        if label[i] != label[i + j + k + 2]:
+                            # check if meets triplet requirement
+                            if calculate_dist(out[i], out[j], out[k], margin):
+                                # check if is semi-hard or hard
+                                if 'anchor' not in dir():
+                                    anchor = out[i].reshape((1, 512))
+                                    positive = out[j].reshape((1, 512))
+                                    negative = out[k].reshape((1, 512))
+                                else:
+                                    anchor = torch.cat((anchor, out[i].reshape((1, 512))), dim=0)
+                                    positive = torch.cat((positive, out[j].reshape((1, 512))), dim=0)
+                                    negative = torch.cat((negative, out[k].reshape((1, 512))), dim=0)
         if 'anchor' not in dir():
             continue
         loss = loss_fn(anchor, positive, negative)
         count += 1
 
         optimizer.zero_grad()
-        loss.backward()
+        loss.backward(retain_graph=True)
         optimizer.step()
 
     time_end = time.time()

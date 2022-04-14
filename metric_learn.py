@@ -6,13 +6,13 @@ from torchvision.transforms import ToTensor
 import resnet
 import triplet_loss
 
-batch_size = 64
+batch_size = 32
 
 train_path = 'Dataset/train'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
 train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True, drop_last=True)
 
-model = resnet.ResNet34(45)
+model = resnet.ResNet34(45, True)
 
 if torch.cuda.is_available():
     model.cuda()

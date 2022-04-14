@@ -1,6 +1,9 @@
 /Data/
 /Dataset/
-/model.pth
 /fig1.jpg
 /fig2.jpg
 /fig3.jpg
+/resnet34.pth
+/Result/
+/densenet121.pth
+/resnet50.pth
