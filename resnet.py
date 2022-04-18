@@ -155,15 +155,16 @@ class ResNet34(nn.Module):
     def forward(self, x):
         x = self.conv(x)
         x = self.block(x)
+        x = x.view(x.size()[0], -1)
         if not self.metric_learn:
-            x = x.view(x.size()[0], -1)
             x = self.fc(x)
         return x
 
 
 class PreResNet34(nn.Module):
-    def __init__(self, num_class):
+    def __init__(self, num_class, metric_learn=False):
         super(PreResNet34, self).__init__()
+        self.metric_learn = metric_learn
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7,
                       stride=2, padding=3),
@@ -197,14 +198,16 @@ class PreResNet34(nn.Module):
             # conv5_x
             nn.AvgPool2d(kernel_size=8)
         )
-        self.fc = nn.Linear(512, num_class)
+        if not self.metric_learn:
+            self.fc = nn.Linear(512, num_class)
 
     def forward(self, x):
         x = self.conv(x)
         x = self.block(x)
-        x = f.relu(x, inplace=True)
         x = x.view(x.size()[0], -1)
-        x = self.fc(x)
+        x = f.relu(x, inplace=True)
+        if not self.metric_learn:
+            x = self.fc(x)
         return x
 
 

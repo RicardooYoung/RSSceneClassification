@@ -1,58 +1,54 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as f
-import time
-from tqdm import tqdm
+from torchvision.datasets import ImageFolder
+from torchvision.transforms import ToTensor
+from torch.utils.data import DataLoader
+
+import resnet
 
 
-def calculate_dist(anchor, positive, negative, margin=0.2):
-    dist = f.pairwise_distance(anchor, positive) - f.pairwise_distance(anchor, negative) + margin
-    if dist <= 0:
-        return False
-    else:
-        return True
+class TripletLoss(nn.Module):
+    def __init__(self, margin=0.3):
+        super(TripletLoss, self).__init__()
+        self.margin = margin
+        self.ranking_loss = nn.MarginRankingLoss(margin=margin)
+
+    def forward(self, inputs, targets):
+        n = inputs.size(0)  # batch_size
+
+        # Compute pairwise distance, replace by the official when merged
+        dist = torch.pow(inputs, 2).sum(dim=1, keepdim=True).expand(n, n)
+        dist = dist + dist.t()
+        dist.addmm_(1, -2, inputs, inputs.t())
+        dist = dist.clamp(min=1e-12).sqrt()  # for numerical stability
+
+        # For each anchor, find the hardest positive and negative
+        mask = targets.expand(n, n).eq(targets.expand(n, n).t())
+        dist_ap, dist_an = [], []
+        for i in range(n):
+            dist_ap.append(dist[i][mask[i]].max().unsqueeze(0))
+            dist_an.append(dist[i][mask[i] == 0].min().unsqueeze(0))
+        dist_ap = torch.cat(dist_ap)
+        dist_an = torch.cat(dist_an)
+
+        # Compute ranking hinge loss
+        y = torch.ones_like(dist_an)
+        loss = self.ranking_loss(dist_an, dist_ap, y)
+        return loss
 
 
-def triplet_loss(model, train_data, optimizer, margin=0.2, epoch=0):
-    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
-    loss_fn = nn.TripletMarginLoss(margin)
+model = resnet.PreResNet34(45, True)
+train_path = 'Dataset/train'
+train_set = ImageFolder(root=train_path, transform=ToTensor())
+batch_size = 64
+lr = 1e-2
+momentum = 0.9
+weight_decay = 1e-4
+train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True,
+                        drop_last=True)
 
-    print('Epoch {} start.'.format(epoch + 1))
-
-    time_start = time.time()
-    count = 0
-    model.train()
-
-    for image, label in tqdm(train_data):
-        if torch.cuda.is_available():
-            image = image.cuda()
-        out = model(image)
-        out = out.reshape((len(out), 512))
-        for i in range(len(label) - 2):
-            for j in range(len(label) - i - 1):
-                for k in range(len(label) - i - j - 2):
-                    if label[i] == label[i + j + 1]:
-                        if label[i] != label[i + j + k + 2]:
-                            # check if meets triplet requirement
-                            if calculate_dist(out[i], out[j], out[k], margin):
-                                # check if is semi-hard or hard
-                                if 'anchor' not in dir():
-                                    anchor = out[i].reshape((1, 512))
-                                    positive = out[j].reshape((1, 512))
-                                    negative = out[k].reshape((1, 512))
-                                else:
-                                    anchor = torch.cat((anchor, out[i].reshape((1, 512))), dim=0)
-                                    positive = torch.cat((positive, out[j].reshape((1, 512))), dim=0)
-                                    negative = torch.cat((negative, out[k].reshape((1, 512))), dim=0)
-        if 'anchor' not in dir():
-            continue
-        loss = loss_fn(anchor, positive, negative)
-        count += 1
-
-        optimizer.zero_grad()
-        loss.backward(retain_graph=True)
-        optimizer.step()
-
-    time_end = time.time()
-
-    print('Epoch: {}, {} mini-batches have valid triplets'.format(epoch, count))
+model.train()
+for image, label in train_data:
+    feature = model(image)
+    loss_fn = TripletLoss()
+    loss = loss_fn(feature, label)
