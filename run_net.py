@@ -26,7 +26,7 @@ for chosen_model in model_sequence:
         model = resnet.PreResNet34(45)
         batch_size = 96
     elif chosen_model == 'resnet50':
-        model = resnet.ResNet50(45)
+        model = resnet.PreResNet50(45)
         batch_size = 32
     elif chosen_model == 'densenet121':
         model = densenet.DenseNet121(12, 45)
@@ -35,10 +35,10 @@ for chosen_model in model_sequence:
     if torch.cuda.is_available():
         model.cuda()
 
-    max_iteration = 30
     lr = 1e-2
     momentum = 0.9
     weight_decay = 1e-4
+    max_iteration = 30
     # Define hyper-parameter
 
     train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True,
