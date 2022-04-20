@@ -3,7 +3,6 @@ import torch.nn as nn
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 import time
 
 import resnet
@@ -57,9 +56,9 @@ model.train()
 if __name__ == '__main__':
     for epoch in range(max_iteration):
         time_start = time.time()
-        for image, label in tqdm(train_data):
-            image = image.cuda()
-            label = label.cuda()
+        for image, label in train_data:
+            image = image.cuda(non_blocking=True)
+            label = label.cuda(non_blocking=True)
             feature = model(image)
             loss = loss_fn(feature, label)
             loss.backward()
