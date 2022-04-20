@@ -26,7 +26,6 @@ for chosen_model in model_sequence:
         model = resnet.PreResNet34(45)
         batch_size = 96
     elif chosen_model == 'resnet50':
-        continue
         model = resnet.PreResNet50(45)
         batch_size = 32
     elif chosen_model == 'densenet121':
@@ -44,14 +43,12 @@ for chosen_model in model_sequence:
 
     train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True,
                             drop_last=True)
-    validation_data = DataLoader(validation_set, batch_size=int(batch_size / 2), shuffle=False, num_workers=4,
+    validation_data = DataLoader(validation_set, batch_size=batch_size, shuffle=False, num_workers=4,
                                  pin_memory=True)
 
     lambda1 = lambda epoch: 0.9 ** epoch
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
     scheduler = LambdaLR(optimizer, lr_lambda=lambda1)
-
-    early_stop = 0
 
     total_train_acc = np.zeros(max_iteration)
     total_validation_acc = np.zeros(max_iteration)
@@ -67,10 +64,10 @@ for chosen_model in model_sequence:
 
         torch.save(model, '{}.pth'.format(chosen_model))
 
-    np.save('Result/{}_train_acc.npy'.format(chosen_model), total_train_acc)
-    np.save('Result/{}_validation_acc.npy'.format(chosen_model), total_validation_acc)
-    np.save('Result/{}_train_loss.npy'.format(chosen_model), total_train_loss)
-    np.save('Result/{}_validation_loss.npy'.format(chosen_model), total_validation_loss)
+        np.save('Result/{}_train_acc.npy'.format(chosen_model), total_train_acc)
+        np.save('Result/{}_validation_acc.npy'.format(chosen_model), total_validation_acc)
+        np.save('Result/{}_train_loss.npy'.format(chosen_model), total_train_loss)
+        np.save('Result/{}_validation_loss.npy'.format(chosen_model), total_validation_loss)
 
     # epoch = np.linspace(1, max_iteration, max_iteration)
     # new_tick = np.linspace(0, max_iteration, max_iteration + 1)

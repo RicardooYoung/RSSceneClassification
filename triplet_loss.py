@@ -21,7 +21,6 @@ class TripletLoss(nn.Module):
         dist = torch.pow(inputs, 2).sum(dim=1, keepdim=True).expand(n, n)
         dist = dist + dist.t()
         dist = torch.addmm(1, dist, -2, inputs, inputs.t())
-        # dist.addmm_(1, -2, inputs, inputs.t())
         dist = dist.clamp(min=1e-12).sqrt()  # for numerical stability
 
         # For each anchor, find the hardest positive and negative
@@ -65,4 +64,4 @@ if __name__ == '__main__':
         time_end = time.time()
         print('Epoch {}, Time Elapsed: {:.3f}s'.format(epoch + 1, time_end - time_start))
 
-torch.save(model, 'resnet34_m.pth')
+    torch.save(model, 'resnet34_m.pth')
