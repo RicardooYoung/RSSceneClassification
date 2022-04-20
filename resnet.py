@@ -210,6 +210,13 @@ class PreResNet34(nn.Module):
             x = self.fc(x)
         return x
 
+    def draw_feature(self, x):
+        x = self.conv(x)
+        x = self.block(x)
+        x = x.view(x.size()[0], -1)
+        x = f.relu(x, inplace=True)
+        return x
+
 
 class ResNet50(nn.Module):
     def __init__(self, num_class):
