@@ -53,10 +53,24 @@ def gen_dataset():
     print('Dataset successfully generated.')
 
 
-def gen_neibour():
+def gen_neighbour():
     path = 'Dataset/train'
     category = os.listdir(path)
     for i in range(len(category)):
         if category[i].startswith('.'):
-            category.pop(i)
-            break
+            continue
+        dst_path = 'Neighbour'
+        dst_path = os.path.join(dst_path, category[i])
+        if not os.path.exists(dst_path):
+            os.mkdir(dst_path)
+        current_cate = path + '/' + category[i]
+        file_list = os.listdir(current_cate)
+        random.shuffle(file_list)
+        for j in range(len(file_list)):
+            current_file = current_cate + '/' + file_list[j]
+            if j < 50:
+                dst_file = os.path.join(dst_path, file_list[j])
+                copyfile(current_file, dst_file)
+            else:
+                break
+    print('Success.')

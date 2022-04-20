@@ -8,22 +8,27 @@ from mpl_toolkits.mplot3d import Axes3D
 
 path = 'Dataset/test'
 model = torch.load('resnet34_m.pth')
+model.cpu()
 test_set = ImageFolder(root=path, transform=ToTensor())
-test_data = DataLoader(test_set, batch_size=64, shuffle=False, num_workers=4, pin_memory=True)
+test_data = DataLoader(test_set, batch_size=64, shuffle=False, pin_memory=True)
 model.eval()
 
 if __name__ == '__main__':
     with torch.no_grad():
-        for image, _ in test_data:
+        for image, label in test_data:
             feature = model(image)
             if 'all_feature' not in dir():
                 all_feature = feature
+                all_label = label
             else:
                 all_feature = torch.cat((all_feature, feature))
+                all_label = torch.cat((all_label, label))
 
     all_feature = all_feature.numpy()
     all_feature = all_feature.T
+    all_label = all_label.numpy()
     pca = PCA(n_components=3)
     pca.fit_transform(all_feature)
-    ax = plt.figure()
+    fig = plt.figure()
+    ax = Axes3D(fig)
     ax.scatter(pca.components_[0, :], pca.components_[1, :], pca.components_[2, :])

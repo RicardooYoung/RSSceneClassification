@@ -49,7 +49,6 @@ weight_decay = 1e-4
 max_iteration = 30
 train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True,
                         drop_last=True)
-# loss_fn = TripletMarginLoss(margin=0.3)
 loss_fn = TripletLoss()
 model.train()
 if __name__ == '__main__':

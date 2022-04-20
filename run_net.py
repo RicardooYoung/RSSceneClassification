@@ -25,26 +25,28 @@ for chosen_model in model_sequence:
     if chosen_model == 'resnet34':
         model = resnet.PreResNet34(45)
         batch_size = 96
+        weight_decay = 3 * 1e-4
     elif chosen_model == 'resnet50':
         model = resnet.PreResNet50(45)
         batch_size = 32
+        weight_decay = 3 * 1e-4
     elif chosen_model == 'densenet121':
+        continue
         model = densenet.DenseNet121(12, 45)
         batch_size = 64
+        weight_decay = 3 * 1e-4
 
     if torch.cuda.is_available():
         model.cuda()
 
     lr = 1e-2
     momentum = 0.9
-    weight_decay = 1e-4
     max_iteration = 30
     # Define hyper-parameter
 
     train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True,
                             drop_last=True)
-    validation_data = DataLoader(validation_set, batch_size=batch_size, shuffle=False, num_workers=4,
-                                 pin_memory=True)
+    validation_data = DataLoader(validation_set, batch_size=batch_size, shuffle=False, num_workers=4)
 
     lambda1 = lambda epoch: 0.9 ** epoch
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
