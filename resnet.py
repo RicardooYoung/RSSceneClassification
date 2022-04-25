@@ -167,7 +167,7 @@ class PreResNet34(nn.Module):
         self.metric_learn = metric_learn
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7,
-                      stride=2, padding=3),
+                      stride=2, padding=3, bias=False),
             # size = /2
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
             # size = /4
@@ -198,17 +198,18 @@ class PreResNet34(nn.Module):
             # conv5_x
             nn.AvgPool2d(kernel_size=8)
         )
-        if not self.metric_learn:
-            self.fc = nn.Linear(512, num_class)
+        self.fc = nn.Linear(512, num_class)
 
     def forward(self, x):
         x = self.conv(x)
         x = self.block(x)
         x = x.view(x.size()[0], -1)
         x = f.relu(x, inplace=True)
-        if not self.metric_learn:
-            x = self.fc(x)
-        return x
+        y = self.fc(x)
+        if self.metric_learn:
+            return x, y
+        else:
+            return y
 
     def draw_feature(self, x):
         x = self.conv(x)
@@ -272,7 +273,7 @@ class PreResNet50(nn.Module):
         super(PreResNet50, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7,
-                      stride=2, padding=3),
+                      stride=2, padding=3, bias=False),
             # size = /2
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
             # size = /4

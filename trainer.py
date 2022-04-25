@@ -3,10 +3,12 @@ import torch.nn as nn
 import time
 from tqdm import tqdm
 
+from triplet_loss import TripletLoss
 
-def train_net(model, train_data, optimizer, epoch=0):
-    # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
-    loss_fn = nn.CrossEntropyLoss()
+
+def train_net(model, train_data, optimizer, epoch=0, alpha=0, metric_learn=False):
+    loss_fn1 = nn.CrossEntropyLoss()
+    loss_fn2 = TripletLoss()
 
     print('Epoch {} start.'.format(epoch + 1))
 
@@ -19,8 +21,12 @@ def train_net(model, train_data, optimizer, epoch=0):
         if torch.cuda.is_available():
             image = image.cuda(non_blocking=True)
             label = label.cuda(non_blocking=True)
-        out = model(image)
-        loss = loss_fn(out, label)
+        if metric_learn:
+            feature, out = model(image)
+            loss = loss_fn1(out, label) + alpha * loss_fn2(feature, label)
+        else:
+            out = model(image)
+            loss = loss_fn1(out, label)
 
         train_loss += loss
 

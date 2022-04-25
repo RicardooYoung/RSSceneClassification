@@ -8,10 +8,10 @@ class DenseLayer(nn.Module):
         self.block = nn.Sequential(
             nn.BatchNorm2d(in_channel),
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_channel, 4 * growth_rate, kernel_size=1),
+            nn.Conv2d(in_channel, 4 * growth_rate, kernel_size=1, bias=False),
             nn.BatchNorm2d(4 * growth_rate),
             nn.ReLU(inplace=True),
-            nn.Conv2d(4 * growth_rate, growth_rate, kernel_size=3, padding=1)
+            nn.Conv2d(4 * growth_rate, growth_rate, kernel_size=3, padding=1, bias=False)
         )
 
     def forward(self, x):
@@ -37,7 +37,7 @@ class Transition(nn.Module):
     def __init__(self, in_channel):
         super(Transition, self).__init__()
         self.block = nn.Sequential(
-            nn.Conv2d(in_channel, int(in_channel / 2), kernel_size=1),
+            nn.Conv2d(in_channel, int(in_channel / 2), kernel_size=1, bias=False),
             nn.AvgPool2d(kernel_size=2, stride=2)
         )
 
@@ -50,7 +50,7 @@ class DenseNet121(nn.Module):
     def __init__(self, growth_rate, num_class):
         super(DenseNet121, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=2 * growth_rate, kernel_size=7, stride=2, padding=3),
+            nn.Conv2d(in_channels=3, out_channels=2 * growth_rate, kernel_size=7, stride=2, padding=3, bias=False),
             # size = /2
             nn.BatchNorm2d(2 * growth_rate),
             nn.ReLU(inplace=True),

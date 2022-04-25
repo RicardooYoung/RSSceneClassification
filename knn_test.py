@@ -22,7 +22,7 @@ def KNN(train_x, train_y, test_x, test_y, k):
     return accuracy_score(test_y, res)
 
 
-neighbour_path = 'Neighbour'
+neighbour_path = 'Dataset/train'
 neighbour_set = ImageFolder(root=neighbour_path, transform=ToTensor())
 batch_size = 96
 neighbour_data = DataLoader(neighbour_set, batch_size=batch_size, num_workers=4, pin_memory=True)

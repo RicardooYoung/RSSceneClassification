@@ -2,9 +2,12 @@ import torch
 import torch.nn as nn
 import time
 
+from triplet_loss import TripletLoss
 
-def test_net(model, validation_data, epoch=0):
-    loss_fn = nn.CrossEntropyLoss()
+
+def test_net(model, validation_data, epoch=0, alpha=0, metric_learn=False):
+    loss_fn1 = nn.CrossEntropyLoss()
+    loss_fn2 = TripletLoss()
     time_start = time.time()
     validation_loss = 0
     validation_acc = 0
@@ -15,8 +18,12 @@ def test_net(model, validation_data, epoch=0):
             if torch.cuda.is_available():
                 image = image.cuda(non_blocking=True)
                 label = label.cuda(non_blocking=True)
-            out = model(image)
-            loss = loss_fn(out, label)
+            if metric_learn:
+                feature, out = model(image)
+                loss = loss_fn1(out, label) + alpha * loss_fn2(feature, label)
+            else:
+                out = model(image)
+                loss = loss_fn1(out, label)
 
             validation_loss += loss.item()
 
