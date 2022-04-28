@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
 
 
 class DenseLayer(nn.Module):
@@ -47,8 +48,9 @@ class Transition(nn.Module):
 
 
 class DenseNet121(nn.Module):
-    def __init__(self, growth_rate, num_class):
+    def __init__(self, growth_rate, num_class, metric_learn=False):
         super(DenseNet121, self).__init__()
+        self.metric_learn = metric_learn
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=2 * growth_rate, kernel_size=7, stride=2, padding=3, bias=False),
             # size = /2
@@ -76,5 +78,15 @@ class DenseNet121(nn.Module):
         x = self.conv(x)
         x = self.block(x)
         x = x.view(x.size()[0], -1)
-        x = self.fc(x)
+        y = f.relu(x)
+        y = self.fc(y)
+        if self.metric_learn:
+            return x, y
+        else:
+            return y
+
+    def draw_feature(self, x):
+        x = self.conv(x)
+        x = self.block(x)
+        x = x.view(x.size()[0], -1)
         return x

@@ -6,7 +6,7 @@ from torchvision.transforms import ToTensor
 
 path = 'Dataset/test'
 test_set = ImageFolder(root=path, transform=ToTensor())
-model_sequence = ['resnet34', 'resnet50', 'densenet121', 'resnet34_m']
+model_sequence = ['resnet34', 'resnet50', 'densenet121', 'resnet34_m', 'densenet121_m']
 
 for chosen_model in model_sequence:
     model = torch.load('{}.pth'.format(chosen_model))
@@ -23,7 +23,11 @@ for chosen_model in model_sequence:
         batch_size = 64
         metric_learn = False
     elif chosen_model == 'resnet34_m':
+        continue
         batch_size = 96
+        metric_learn = True
+    elif chosen_model == 'densenet121_m':
+        batch_size = 64
         metric_learn = True
 
     if torch.cuda.is_available():

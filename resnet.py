@@ -204,8 +204,8 @@ class PreResNet34(nn.Module):
         x = self.conv(x)
         x = self.block(x)
         x = x.view(x.size()[0], -1)
-        x = f.relu(x, inplace=True)
-        y = self.fc(x)
+        y = f.relu(x)
+        y = self.fc(y)
         if self.metric_learn:
             return x, y
         else:
@@ -215,7 +215,6 @@ class PreResNet34(nn.Module):
         x = self.conv(x)
         x = self.block(x)
         x = x.view(x.size()[0], -1)
-        x = f.relu(x, inplace=True)
         return x
 
 

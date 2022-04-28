@@ -6,8 +6,8 @@ from torchvision.transforms import ToTensor
 from torch.optim.lr_scheduler import LambdaLR
 import os
 
-import resnet
 import densenet
+import resnet
 import trainer
 import evaluator
 
@@ -16,27 +16,24 @@ validation_path = 'Dataset/validation'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
 validation_set = ImageFolder(root=validation_path, transform=ToTensor())
 
-model_sequence = ['resnet34', 'resnet50', 'densenet121']
-
 if not os.path.exists('Result'):
     os.mkdir('Result')
 
+model_sequence = ['resnet34_m', 'densenet121_m']
 for chosen_model in model_sequence:
-    if chosen_model == 'resnet34':
-        continue
-        model = resnet.PreResNet34(45)
+    if chosen_model == 'resnet34_m':
+        model = resnet.PreResNet34(45, True)
         batch_size = 96
-    elif chosen_model == 'resnet50':
+    elif chosen_model == 'densenet121_m':
         continue
-        model = resnet.PreResNet50(45)
-        batch_size = 32
-    elif chosen_model == 'densenet121':
-        model = densenet.DenseNet121(16, 45)
+        model = densenet.DenseNet121(16, 45, True)
+        # model = torch.load('densenet121_m.pth')
         batch_size = 64
 
     if torch.cuda.is_available():
         model.cuda()
 
+    alpha = 0.05
     lr = 1e-2
     momentum = 0.9
     max_iteration = 40
@@ -48,6 +45,7 @@ for chosen_model in model_sequence:
     validation_data = DataLoader(validation_set, batch_size=batch_size, shuffle=False, num_workers=4)
 
     lambda1 = lambda epoch: 0.9 ** epoch
+    lambda2 = lambda epoch: (epoch < 20) * (epoch + 1) + (epoch >= 20)
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
     scheduler = LambdaLR(optimizer, lr_lambda=lambda1)
 
@@ -58,10 +56,14 @@ for chosen_model in model_sequence:
 
     if __name__ == '__main__':
         for epoch in range(max_iteration):
-            total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, optimizer, epoch)
+            total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, optimizer, epoch,
+                                                                                alpha=alpha * lambda2(epoch),
+                                                                                metric_learn=True)
             scheduler.step()
             total_validation_acc[epoch], total_validation_loss[epoch] = evaluator.test_net(model, validation_data,
-                                                                                           epoch)
+                                                                                           epoch,
+                                                                                           alpha=alpha * lambda2(epoch),
+                                                                                           metric_learn=True)
 
         torch.save(model, '{}.pth'.format(chosen_model))
 
@@ -69,27 +71,3 @@ for chosen_model in model_sequence:
         np.save('Result/{}_validation_acc.npy'.format(chosen_model), total_validation_acc)
         np.save('Result/{}_train_loss.npy'.format(chosen_model), total_train_loss)
         np.save('Result/{}_validation_loss.npy'.format(chosen_model), total_validation_loss)
-
-# epoch = np.linspace(1, max_iteration, max_iteration)
-# new_tick = np.linspace(0, max_iteration, max_iteration + 1)
-# plt.figure()
-# plt.plot(epoch, total_train_acc[0:max_iteration], '-.^')
-# plt.plot(epoch, total_validation_acc[0:max_iteration], '-.^')
-# plt.title('Train & Validation Accuracy')
-# plt.xlabel('Epoch')
-# plt.ylabel('Accuracy')
-# plt.xticks(new_tick)
-# plt.legend(['Train Acc', 'Test Acc'])
-# plt.savefig('fig1.jpg')
-# plt.show()
-#
-# plt.figure()
-# plt.plot(epoch, total_train_loss, '-.^')
-# plt.plot(epoch, total_validation_loss, '-.^')
-# plt.title('Train & Test Loss')
-# plt.xlabel('Epoch')
-# plt.ylabel('Loss')
-# plt.xticks(new_tick)
-# plt.legend(['Train Loss', 'Test Loss'])
-# plt.savefig('fig2.jpg')
-# plt.show()
