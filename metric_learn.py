@@ -27,7 +27,6 @@ for chosen_model in model_sequence:
     elif chosen_model == 'densenet121_m':
         continue
         model = densenet.DenseNet121(16, 45, True)
-        # model = torch.load('densenet121_m.pth')
         batch_size = 64
 
     if torch.cuda.is_available():

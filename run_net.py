@@ -23,7 +23,6 @@ if not os.path.exists('Result'):
 
 for chosen_model in model_sequence:
     if chosen_model == 'resnet34':
-        continue
         model = resnet.PreResNet34(45)
         batch_size = 96
     elif chosen_model == 'resnet50':
