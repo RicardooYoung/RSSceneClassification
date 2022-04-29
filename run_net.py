@@ -24,14 +24,12 @@ if not os.path.exists('Result'):
 for chosen_model in model_sequence:
     if chosen_model == 'resnet34':
         model = resnet.PreResNet34(45)
-        batch_size = 96
     elif chosen_model == 'resnet50':
         continue
         model = resnet.PreResNet50(45)
         batch_size = 32
     elif chosen_model == 'densenet121':
         model = densenet.DenseNet121(16, 45)
-        batch_size = 64
 
     if torch.cuda.is_available():
         model.cuda()
@@ -40,6 +38,7 @@ for chosen_model in model_sequence:
     momentum = 0.9
     max_iteration = 40
     weight_decay = 0.0025
+    batch_size = 64
     # Define hyper-parameter
 
     train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True,

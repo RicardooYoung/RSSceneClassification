@@ -3,7 +3,7 @@ import torch.nn as nn
 import time
 
 
-def test_net(model, validation_data, epoch=0, alpha=0, metric_learn=False):
+def test_net(model, validation_data, epoch=0, metric_learn=False):
     loss_fn = nn.CrossEntropyLoss()
     time_start = time.time()
     validation_loss = 0
