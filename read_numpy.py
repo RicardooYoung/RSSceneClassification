@@ -11,8 +11,10 @@ for chosen_model in model_sequence:
     path = 'Result/{}_validation_acc.npy'.format(chosen_model)
     acc = np.load(path)
     plt.plot(epoch, acc, '-.')
-    plt.title('Learning Curve on Validation Set')
 
+plt.title('Learning Curve on Validation Set')
+plt.xlabel('Epoch')
+plt.ylabel('Top-1 Accuracy')
 plt.legend(['ResNet34', 'ResNet34M', 'DenseNet121', 'DenseNet121M'])
 plt.savefig('fig1.jpg')
 plt.close()
