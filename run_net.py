@@ -37,7 +37,7 @@ for chosen_model in model_sequence:
     lr = 1e-2
     momentum = 0.9
     max_iteration = 40
-    weight_decay = 0.0025
+    weight_decay = 0.005
     batch_size = 64
     # Define hyper-parameter
 

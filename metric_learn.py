@@ -24,7 +24,6 @@ for chosen_model in model_sequence:
     if chosen_model == 'resnet34_m':
         model = resnet.PreResNet34(45, True)
     elif chosen_model == 'densenet121_m':
-        continue
         model = densenet.DenseNet121(16, 45, True)
 
     if torch.cuda.is_available():

@@ -60,4 +60,3 @@ for i in range(2):
             del all_label
     plt.savefig('fig{}.jpg'.format(i + 2))
     plt.close()
-
