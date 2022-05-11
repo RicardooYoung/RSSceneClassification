@@ -6,5 +6,5 @@ RESISC45.
 * Download RESISC45 dataset, unzip and move it to the same directory.
 * Rename it to *Data*.
 * Run *gen_dataset.py*.
-* Modifying code in *run_net.py* (using ResNet34 as default).
-* Run *run_net.py*.
+* Modifying code in *run_net.py* and *metric_learn.py*.
+* Run *run_net.py* to train ResNet34 and DenseNet121, run *metric_learn.py* to train ResNet34M and DenseNet121M, or just run *main.py* to train both.
