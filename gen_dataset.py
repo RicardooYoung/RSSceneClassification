@@ -16,8 +16,14 @@ def gen_dataset():
         os.mkdir(set_path)
 
     train_path = os.path.join(set_path, 'train')
+    if not os.path.exists(train_path):
+        os.mkdir(train_path)
     validation_path = os.path.join(set_path, 'validation')
+    if not os.path.exists(validation_path):
+        os.mkdir(validation_path)
     test_path = os.path.join(set_path, 'test')
+    if not os.path.exists(test_path):
+        os.mkdir(test_path)
 
     if not os.path.exists(train_path):
         os.mkdir(train_path)
@@ -41,9 +47,9 @@ def gen_dataset():
         random.shuffle(file_list)
         for j in range(len(file_list)):
             current_file = current_cate + '/' + file_list[j]
-            if j < 490:
+            if j < 470:
                 dst_file = train_path + '/' + file_list[j]
-            elif 490 <= j < 560:
+            elif 470 <= j < 540:
                 dst_file = validation_path + '/' + file_list[j]
             else:
                 dst_file = test_path + '/' + file_list[j]
@@ -53,30 +59,4 @@ def gen_dataset():
     print('Dataset successfully generated.')
 
 
-def gen_neighbour():
-    path = 'Dataset/train'
-    category = os.listdir(path)
-    dst_path = 'Neighbour'
-    if not os.path.exists(dst_path):
-        os.mkdir(dst_path)
-    for i in range(len(category)):
-        if category[i].startswith('.'):
-            continue
-        dst_path = 'Neighbour'
-        dst_path = os.path.join(dst_path, category[i])
-        if not os.path.exists(dst_path):
-            os.mkdir(dst_path)
-        current_cate = path + '/' + category[i]
-        file_list = os.listdir(current_cate)
-        random.shuffle(file_list)
-        for j in range(len(file_list)):
-            current_file = current_cate + '/' + file_list[j]
-            if j < 100:
-                dst_file = os.path.join(dst_path, file_list[j])
-                copyfile(current_file, dst_file)
-            else:
-                break
-    print('Success.')
-
-
-gen_neighbour()
+gen_dataset()
