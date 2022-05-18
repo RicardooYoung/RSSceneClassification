@@ -22,6 +22,7 @@ if not os.path.exists('Result'):
 model_sequence = ['resnet34_m', 'densenet121_m']
 for chosen_model in model_sequence:
     if chosen_model == 'resnet34_m':
+        continue
         model = resnet.PreResNet34(45, True)
     elif chosen_model == 'densenet121_m':
         model = densenet.DenseNet121(16, 45, True)

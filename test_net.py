@@ -17,7 +17,6 @@ for chosen_model in model_sequence:
         metric_learn = False
     elif chosen_model == 'resnet50':
         continue
-        batch_size = 32
         metric_learn = False
     elif chosen_model == 'densenet121':
         metric_learn = False

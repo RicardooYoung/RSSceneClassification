@@ -78,8 +78,8 @@ class DenseNet121(nn.Module):
         x = self.conv(x)
         x = self.block(x)
         x = x.view(x.size()[0], -1)
-        y = f.relu(x)
-        y = self.fc(y)
+        x = f.relu(x)
+        y = self.fc(x)
         if self.metric_learn:
             return x, y
         else:
@@ -89,4 +89,5 @@ class DenseNet121(nn.Module):
         x = self.conv(x)
         x = self.block(x)
         x = x.view(x.size()[0], -1)
+        x = f.relu(x)
         return x
