@@ -2,13 +2,16 @@ import torch
 import torch.nn as nn
 import time
 from tqdm import tqdm
+import numpy as np
 
 from triplet_loss import TripletLoss
+from nca import NCALoss
 
 
-def train_net(model, train_data, optimizer, epoch=0, alpha=0, metric_learn=False):
+def train_net(model, train_data, optimizer, epoch=0, alpha=0, metric_learn=False, proxy=None):
     loss_fn1 = nn.CrossEntropyLoss()
     loss_fn2 = TripletLoss()
+    loss_fn3 = NCALoss()
 
     print('Epoch {} start.'.format(epoch + 1))
 
@@ -24,6 +27,27 @@ def train_net(model, train_data, optimizer, epoch=0, alpha=0, metric_learn=False
         if metric_learn:
             feature, out = model(image)
             loss = loss_fn1(out, label) + alpha * loss_fn2(feature, label)
+        elif proxy is not None:
+            loss = torch.zeros(1, device='cuda')
+            triplet = nn.TripletMarginLoss(margin=0.5, p=2)
+            positive_proxy = torch.ones(image.size(0), 512, device='cuda', requires_grad=False)
+            feature, out = model(image)
+            for i in range(label.size(0)):
+                positive_proxy[i] = proxy[label[i]]
+            idx = np.zeros(label.size(0))
+            for j in range(44):
+                negative_proxy = torch.ones_like(positive_proxy, device='cuda', requires_grad=False)
+                for i in range(label.size(0)):
+                    if idx[i] == label[i]:
+                        idx[i] += 1
+                    negative_proxy[i] = proxy[int(idx[i])]
+                idx += 1
+                temp_loss = triplet(feature, positive_proxy, negative_proxy)
+                loss += temp_loss
+
+            # feature, out = model(image)
+            # loss = loss_fn3(feature, label, proxy)
+
         else:
             out = model(image)
             loss = loss_fn1(out, label)
@@ -43,6 +67,6 @@ def train_net(model, train_data, optimizer, epoch=0, alpha=0, metric_learn=False
 
     print(
         'Epoch: {}, Train Loss: {:.6f}, Train Acc: {:.6f}, Time Elapsed: {:.3f}s'
-            .format(epoch + 1, train_loss / len(train_data), train_acc / len(train_data), time_end - time_start))
+        .format(epoch + 1, train_loss.item() / len(train_data), train_acc / len(train_data), time_end - time_start))
 
-    return train_acc / len(train_data), train_loss / len(train_data)
+    return train_acc / len(train_data), train_loss.item() / len(train_data)

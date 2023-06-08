@@ -22,16 +22,18 @@ if not os.path.exists('Result'):
 model_sequence = ['resnet34_m', 'densenet121_m']
 for chosen_model in model_sequence:
     if chosen_model == 'resnet34_m':
-        continue
-        model = resnet.PreResNet34(45, True)
+        # model = resnet.PreResNet34(45, True)
+        model = torch.load('resnet34.pth')
     elif chosen_model == 'densenet121_m':
-        model = densenet.DenseNet121(16, 45, True)
+        continue
+        # model = densenet.DenseNet121(16, 45, True)
 
+    model.metric_learn = True
     if torch.cuda.is_available():
         model.cuda()
 
-    alpha = 0.05
-    lr = 1e-2
+    alpha = 1
+    lr = 1e-3
     momentum = 0.9
     max_iteration = 40
     weight_decay = 0.005
@@ -43,7 +45,6 @@ for chosen_model in model_sequence:
     validation_data = DataLoader(validation_set, batch_size=batch_size, shuffle=False, num_workers=4)
 
     lambda1 = lambda epoch: 0.9 ** epoch
-    lambda2 = lambda epoch: (epoch < 20) * (epoch + 1) + (epoch >= 20)
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
     scheduler = LambdaLR(optimizer, lr_lambda=lambda1)
 
@@ -55,8 +56,7 @@ for chosen_model in model_sequence:
     if __name__ == '__main__':
         for epoch in range(max_iteration):
             total_train_acc[epoch], total_train_loss[epoch] = trainer.train_net(model, train_data, optimizer, epoch,
-                                                                                alpha=alpha * lambda2(epoch),
-                                                                                metric_learn=True)
+                                                                                alpha=alpha, metric_learn=True)
             scheduler.step()
             total_validation_acc[epoch], total_validation_loss[epoch] = evaluator.test_net(model, validation_data,
                                                                                            epoch, metric_learn=True)

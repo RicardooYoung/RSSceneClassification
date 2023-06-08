@@ -47,9 +47,9 @@ def gen_dataset():
         random.shuffle(file_list)
         for j in range(len(file_list)):
             current_file = current_cate + '/' + file_list[j]
-            if j < 470:
+            if j < 140:
                 dst_file = train_path + '/' + file_list[j]
-            elif 470 <= j < 540:
+            elif 140 <= j < 210:
                 dst_file = validation_path + '/' + file_list[j]
             else:
                 dst_file = test_path + '/' + file_list[j]

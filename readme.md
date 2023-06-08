@@ -1,6 +1,6 @@
 # RESISC45Project
 ## Intro
-This is a project using CNNs to perform remote sensing image scene classification on 
+This is a demo in my graduation thesis, using CNNs to perform remote sensing image scene classification on 
 RESISC45.
 ## How to use
 * Download RESISC45 dataset, unzip and move it to the same directory.

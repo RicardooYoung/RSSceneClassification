@@ -6,6 +6,8 @@ from torchvision.transforms import ToTensor
 from torch.optim.lr_scheduler import LambdaLR
 import os
 
+from vit_pytorch import ViT
+
 import resnet
 import densenet
 import trainer
@@ -16,29 +18,44 @@ validation_path = 'Dataset/validation'
 train_set = ImageFolder(root=train_path, transform=ToTensor())
 validation_set = ImageFolder(root=validation_path, transform=ToTensor())
 
-model_sequence = ['resnet34', 'resnet50', 'densenet121']
+model_sequence = ['resnet34', 'resnet50', 'densenet121', 'vit']
 
 if not os.path.exists('Result'):
     os.mkdir('Result')
 
+batch_size = 64
+
 for chosen_model in model_sequence:
     if chosen_model == 'resnet34':
+        continue
         model = resnet.PreResNet34(45)
     elif chosen_model == 'resnet50':
         continue
         model = resnet.PreResNet50(45)
         batch_size = 32
     elif chosen_model == 'densenet121':
+        continue
         model = densenet.DenseNet121(16, 45)
+    elif chosen_model == 'vit':
+        model = ViT(
+            image_size=256,
+            patch_size=32,
+            num_classes=45,
+            dim=1024,
+            depth=12,
+            heads=16,
+            mlp_dim=2048,
+            dropout=0.1,
+            emb_dropout=0.1
+        )
 
     if torch.cuda.is_available():
         model.cuda()
 
     lr = 1e-2
     momentum = 0.9
-    max_iteration = 40
+    max_iteration = 30
     weight_decay = 0.005
-    batch_size = 64
     # Define hyper-parameter
 
     train_data = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True,

@@ -16,3 +16,6 @@
 /fig1.jpg
 /resnet34_m_result.txt
 /resnet34_result.txt
+/proxy.npy
+/proxy.pth
+/resnet34_proxy.pth

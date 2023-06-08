@@ -196,7 +196,7 @@ class PreResNet34(nn.Module):
             PreResUnit(512, 512),
             PreResUnit(512, 512),
             # conv5_x
-            nn.AvgPool2d(kernel_size=8)
+            nn.AvgPool2d(kernel_size=8),
         )
         self.fc = nn.Linear(512, num_class)
 
